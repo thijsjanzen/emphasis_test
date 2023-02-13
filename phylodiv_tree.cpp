@@ -1,6 +1,6 @@
 #include "phylodiv_tree.hpp"
 
-
+/*
 // [[Rcpp::export]]
 Rcpp::NumericMatrix simulate_pd_trees_cpp(Rcpp::NumericVector pars,
                                  float max_t,
@@ -68,3 +68,4 @@ Rcpp::NumericMatrix explore_grid_cpp(Rcpp::NumericVector par1,
   }
   return output;
 }
+*/
