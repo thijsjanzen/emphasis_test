@@ -49,7 +49,8 @@ namespace emphasis {
                   double max_lambda,
                   int num_threads)
   {
-    if (!model.is_threadsafe()) num_threads = 1;
+    num_threads = 1;
+    //if (!model.is_threadsafe()) num_threads = 1;
     //tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
     std::mutex mutex;
     std::atomic<bool> stop{ false };    // non-handled exception
