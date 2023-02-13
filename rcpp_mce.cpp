@@ -76,20 +76,20 @@ std::vector<double> rcpp_mce_nothrow(const std::vector<double>& brts,
   auto model = emphasis::Model(lower_bound, upper_bound);
   
   try {
-  auto E = emphasis::E_step(sample_size,
-                            maxN,
-                            init_pars,
-                            brts,
-                            model,
-                            soc,
-                            max_missing,
-                            max_lambda,
-                            num_threads);
-  std::vector<double> out = {E.fhat, 
-                             double(E.rejected_lambda),
-                             double(E.rejected_overruns), 
-                             double(E.rejected_zero_weights)};
-  return out;
+    auto E = emphasis::E_step(sample_size,
+                              maxN,
+                              init_pars,
+                              brts,
+                              model,
+                              soc,
+                              max_missing,
+                              max_lambda,
+                              num_threads);
+    std::vector<double> out = {E.fhat, 
+                               double(E.rejected_lambda),
+                               double(E.rejected_overruns), 
+                               double(E.rejected_zero_weights)};
+    return out;
   } catch (const emphasis::emphasis_error_E& E) {
     return {42, //E.E_.fhat, 
             double(E.E_.rejected_lambda),
@@ -154,6 +154,7 @@ int main() {
     int num_pars = 25;
     
     emphasis::reng_t reng_ = make_random_engine<emphasis::reng_t>();
+    reng_.seed(0x12345678);
     std::vector< std::vector< double >> pars;
     std::uniform_real_distribution<double> dist;
     for (int i = 0; i < num_pars; ++i) {
@@ -181,7 +182,7 @@ int main() {
                   lb, // lower_bound
                   ub, // upper_bound
                   0.1, // xtol_rel
-                  1); // num_threads
+                  1000); // num_threads, clamped to ncore
     
     auto clock_end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = clock_end - clock_start;

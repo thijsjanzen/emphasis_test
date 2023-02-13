@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include <string>
+#include <tbb/tbb.h>
 #include "model.hpp"
 #include "emphasis.hpp"
 #include "augment_tree.hpp"
@@ -49,19 +50,19 @@ namespace emphasis {
                   double max_lambda,
                   int num_threads)
   {
-    num_threads = 1;
-    //if (!model.is_threadsafe()) num_threads = 1;
-    //tbb::task_scheduler_init _tbb((num_threads > 0) ? num_threads : tbb::task_scheduler_init::automatic);
+    if (!model.is_threadsafe()) num_threads = 1;
+    num_threads = std::max<unsigned>(1, std::min<unsigned>(std::thread::hardware_concurrency(), num_threads));
+
     std::mutex mutex;
     std::atomic<bool> stop{ false };    // non-handled exception
     tree_t init_tree = detail::create_tree(brts, static_cast<double>(soc));
 
     auto E = E_step_t{};
     auto T0 = std::chrono::high_resolution_clock::now();
-    const int grainsize = maxN / std::max<unsigned>(1, std::min<unsigned>(std::thread::hardware_concurrency(), num_threads));
-   // tbb::parallel_for(tbb::blocked_range<unsigned>(0, maxN, grainsize), [&](const tbb::blocked_range<unsigned>& r) {
-   //   for (unsigned i = r.begin(); i < r.end(); ++i) {
-      for (unsigned i = 0; i < maxN; ++i) {
+    const int grainsize = maxN / num_threads;
+    tbb::task_arena arena(num_threads);
+    tbb::parallel_for(tbb::blocked_range<unsigned>(0, maxN, grainsize), [&](const tbb::blocked_range<unsigned>& r) {
+      for (unsigned i = r.begin(); i < r.end(); ++i) {
         try {
           if (!stop) {
             // reuse tree from pool
@@ -104,7 +105,7 @@ namespace emphasis {
 	      catch (...) {
 	      }
       }
- //   });
+    });
     if (static_cast<int>(E.weights.size()) < N) {
       if (static_cast<int>(E.weights.size()) < N) {
         std::string msg = "maxN exceeded with rejection reasons: ";
