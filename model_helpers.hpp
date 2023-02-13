@@ -201,23 +201,24 @@ namespace emphasis {
   
   
   
-      inline double calculate_pd2(double tm, const std::vector<node_t>& tree)
-      {
-        double brts = 0.0;
-        double prev_brts = 0.0;
-        double ni = tree[0].n;
-        double pd = 0.0;
-        for (size_t i = 0; (i < tree.size()) && (tree[i].brts <= tm); ++i) {
-          const auto& node = tree[i];
-          brts = node.brts;
-          if ((node.t_ext > tm)) {
-            pd += (brts - prev_brts) * ni++;
-            prev_brts = brts;
-          }
-        }
-          
-        return pd + (tm - prev_brts) * ni;   // remainder
-      }
+    inline double calculate_pd2(double tm, const std::vector<node_t>& tree)
+    {
+      return calculate_pd(tm, static_cast<unsigned>(tree.size()), tree.data());
+      //double brts = 0.0;
+      //double prev_brts = 0.0;
+      //double ni = tree[0].n;
+      //double pd = 0.0;
+      //for (size_t i = 0; (i < tree.size()) && (tree[i].brts <= tm); ++i) {
+      //  const auto& node = tree[i];
+      //  brts = node.brts;
+      //  if ((node.t_ext > tm)) {
+      //    pd += (brts - prev_brts) * ni++;
+      //    prev_brts = brts;
+      //  }
+      //}
+      //  
+      //return pd + (tm - prev_brts) * ni;   // remainder
+    }
 
   }
 

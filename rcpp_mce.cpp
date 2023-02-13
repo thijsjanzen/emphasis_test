@@ -174,8 +174,8 @@ int main() {
     
     rcpp_mce_grid(pars,
                   brts,
-                  100, // sample_size
-                  100, // maxN
+                  10000, // sample_size
+                  10000, // maxN
                   2, // soc
                   1000, //max_missing
                   1000, // max_lambda
